@@ -25,6 +25,7 @@ abstract class RpcMacroCommons(ctx: blackbox.Context) extends AbstractMacroCommo
   val WhenAbsentAT: Type = getType(tq"$CommonsPkg.serialization.whenAbsent[_]")
   val RpcArityAT: Type = getType(tq"$RpcPackage.RpcArity")
   val SingleArityAT: Type = getType(tq"$RpcPackage.single")
+  val CompositeArityAT: Type = getType(tq"$RpcPackage.composite")
   val OptionalArityAT: Type = getType(tq"$RpcPackage.optional")
   val MultiArityAT: Type = getType(tq"$RpcPackage.multi")
   val RpcEncodingAT: Type = getType(tq"$RpcPackage.RpcEncoding")

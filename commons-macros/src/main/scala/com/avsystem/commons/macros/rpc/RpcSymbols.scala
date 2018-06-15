@@ -7,6 +7,7 @@ trait RpcSymbols { this: RpcMacroCommons =>
 
   sealed abstract class RpcArity
   object RpcArity {
+    trait Composite extends RpcArity
     trait Single extends RpcArity
     trait Optional extends RpcArity
     trait Multi extends RpcArity
@@ -17,9 +18,10 @@ trait RpcSymbols { this: RpcMacroCommons =>
   }
   object RpcParamArity {
     def fromAnnotation(param: ArityParam,
-      allowMulti: Boolean, allowListed: Boolean, allowNamed: Boolean): RpcParamArity = {
+      allowComposite: Boolean, allowMulti: Boolean, allowListed: Boolean, allowNamed: Boolean): RpcParamArity = {
       val at = param.annot(RpcArityAT).fold(SingleArityAT)(_.tpe)
       if (at <:< SingleArityAT) RpcParamArity.Single(param.actualType)
+      else if(at <:< CompositeArityAT) RpcParamArity.Composite(param.actualType)
       else if (at <:< OptionalArityAT) {
         val optionLikeType = typeOfCachedImplicit(param.optionLike)
         val valueMember = optionLikeType.member(TypeName("Value"))
@@ -45,6 +47,7 @@ trait RpcSymbols { this: RpcMacroCommons =>
     }
 
     case class Single(collectedType: Type) extends RpcParamArity(true) with RpcArity.Single
+    case class Composite(collectedType: Type) extends RpcParamArity(true) with RpcArity.Composite
     case class Optional(collectedType: Type) extends RpcParamArity(true) with RpcArity.Optional
     case class Multi(collectedType: Type, named: Boolean) extends RpcParamArity(false) with RpcArity.Multi
   }
@@ -70,7 +73,10 @@ trait RpcSymbols { this: RpcMacroCommons =>
           method.reportProblem(s"multi raw method must take at most two parameter lists where the first one " +
             "must contain RPC name parameter typed as String")
       }
-      else method.reportProblem(s"unrecognized RPC arity annotation: $at")
+      else if (at <:< CompositeArityAT)
+        method.reportProblem(s"@construct is not allowed on methods")
+      else
+        method.reportProblem(s"unrecognized RPC arity annotation: $at")
     }
 
     case object Single extends RpcMethodArity(true) with RpcArity.Single
@@ -210,12 +216,13 @@ trait RpcSymbols { this: RpcMacroCommons =>
   }
 
   trait ArityParam extends RpcParam with AritySymbol {
+    def allowComposite: Boolean
     def allowMulti: Boolean
     def allowNamedMulti: Boolean
     def allowListedMulti: Boolean
 
     val arity: RpcParamArity =
-      RpcParamArity.fromAnnotation(this, allowMulti, allowListedMulti, allowNamedMulti)
+      RpcParamArity.fromAnnotation(this, allowComposite, allowMulti, allowListedMulti, allowNamedMulti)
 
     lazy val optionLike: TermName = infer(tq"$OptionLikeCls[$actualType]")
 
@@ -242,6 +249,7 @@ trait RpcSymbols { this: RpcMacroCommons =>
   }
 
   trait RawParamLike extends ArityParam with RawRpcSymbol {
+    def allowComposite: Boolean = true
     def allowMulti: Boolean = true
     def allowNamedMulti: Boolean = true
     def allowListedMulti: Boolean = true

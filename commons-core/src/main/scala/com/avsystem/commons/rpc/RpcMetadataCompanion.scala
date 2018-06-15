@@ -4,7 +4,7 @@ package rpc
 import com.avsystem.commons.macros.rpc.RpcMacros
 
 trait RpcMetadataCompanion[M[_]] extends RpcImplicitsProvider {
-  def materializeForRpc[T]: M[T] = macro RpcMacros.rpcMetadata[M[T], T]
+  def materializeForRpc[Real]: M[Real] = macro RpcMacros.rpcMetadata[M[Real], Real]
 
   final class Lazy[T](metadata: => M[T]) {
     lazy val value: M[T] = metadata

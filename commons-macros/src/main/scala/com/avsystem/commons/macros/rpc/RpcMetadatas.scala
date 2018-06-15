@@ -38,6 +38,7 @@ trait RpcMetadatas { this: RpcMacroCommons with RpcSymbols with RpcMappings =>
   class MethodMetadataParam(owner: RpcMetadataConstructor, symbol: Symbol)
     extends MetadataParam[RealRpcTrait](owner, symbol) with RawRpcSymbol with ArityParam {
 
+    def allowComposite: Boolean = false
     def allowMulti: Boolean = true
     def allowNamedMulti: Boolean = true
     def allowListedMulti: Boolean = false
@@ -275,6 +276,7 @@ trait RpcMetadatas { this: RpcMacroCommons with RpcSymbols with RpcMappings =>
   class ReifiedAnnotParam[Real <: RealRpcSymbol](owner: MetadataConstructor[Real], symbol: Symbol)
     extends DirectMetadataParam[Real](owner, symbol) with ArityParam {
 
+    def allowComposite: Boolean = false
     def allowMulti: Boolean = true
     def allowNamedMulti: Boolean = false
     def allowListedMulti: Boolean = true

@@ -18,4 +18,8 @@ class SealedEnumTest extends FunSuite {
     import SomeEnum._
     assert(values == List(First, Second, Third, Fourth))
   }
+
+  test("instance listing") {
+    SealedUtils.instancesFor[SomeEnum, ClassTag].foreach(println)
+  }
 }

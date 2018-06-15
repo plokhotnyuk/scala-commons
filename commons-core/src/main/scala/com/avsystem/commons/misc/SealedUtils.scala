@@ -12,6 +12,8 @@ object SealedUtils {
     */
   @explicitGenerics
   def caseObjectsFor[T]: List[T] = macro macros.misc.SealedMacros.caseObjectsFor[T]
+
+  def instancesFor[T, TC[_]]: List[TC[_ <: T]] = macro macros.misc.SealedMacros.instancesFor[T, TC[_]]
 }
 
 /**

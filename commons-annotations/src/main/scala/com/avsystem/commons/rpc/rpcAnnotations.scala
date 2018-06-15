@@ -44,6 +44,7 @@ trait RpcTag extends RpcAnnotation
   */
 sealed trait RpcArity extends RawParamAnnotation
 
+
 /**
   * The default arity annotation. Usually there is no need to use this annotation explicitly.
   *
@@ -68,6 +69,8 @@ sealed trait RpcArity extends RawParamAnnotation
   * compilation error will be raised.
   */
 final class single extends RpcArity
+
+final class composite extends RpcArity
 
 /**
   * When applied on raw method, it works almost the same way as [[single]] except that it is not required that
